@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products - Poohanas{% endblock %}
+
+{% block content %}
+<div class="products-page">
+    <div class="container">
+        <!-- Page Header -->
+        <header class="products-header">
+            <h1 class="products-title">Graphics Cards</h1>
+            <p class="products-subtitle">Browse our collection of premium graphics cards</p>
+        </header>
+
+        <div class="products-layout">
+            <!-- Filters Sidebar -->
+            <aside class="filters-sidebar">
+                <form method="get" class="filters-form" id="filtersForm">
+                    <div class="filter-section">
+                        <h3 class="filter-title">Search</h3>
+                        <input type="text" name="query" value="{{ current_filters.query }}" placeholder="Search products..." class="filter-input">
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Brand</h3>
+                        <select name="brand" class="filter-select">
+                            <option value="">All Brands</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.slug }}" {% if current_filters.brand == brand.slug %}selected{% endif %}>
+                                {{ brand.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Price Range</h3>
+                        <div class="price-range">
+                            <input type="number" name="min_price" value="{{ current_filters.min_price }}" placeholder="Min" class="filter-input" min="0">
+                            <span class="price-separator">-</span>
+                            <input type="number" name="max_price" value="{{ current_filters.max_price }}" placeholder="Max" class="filter-input" min="0">
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">VRAM</h3>
+                        <select name="vram" class="filter-select">
+                            <option value="">Any VRAM</option>
+                            {% for vram in vram_options %}
+                            <option value="{{ vram }}" {% if current_filters.vram == vram|stringformat:"s" %}selected{% endif %}>
+                                {{ vram }}GB
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3 class="filter-title">Memory Type</h3>
+                        <select name="memory_type" class="filter-select">
+                            <option value="">Any</option>
+                            {% for mem_type in memory_types %}
+                            <option value="{{ mem_type }}" {% if current_filters.memory_type == mem_type %}selected{% endif %}>
+                                {{ mem_type }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="filter-section">
+                        <label class="filter-checkbox">
+                            <input type="checkbox" name="in_stock" value="1" {% if current_filters.in_stock %}checked{% endif %}>
+                            <span>In Stock Only</span>
+                        </label>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-primary btn-block">Apply Filters</button>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-ghost btn-block">Clear Filters</a>
+                    </div>
+                </form>
+            </aside>
+
+            <!-- Products Grid -->
+            <div class="products-main">
+                <!-- Toolbar -->
+                <div class="products-toolbar">
+                    <div class="results-count">
+                        Showing {{ products.start_index }}-{{ products.end_index }} of {{ paginator.count }} products
+                    </div>
+
+                    <div class="sort-dropdown">
+                        <label for="sort" class="sr-only">Sort by</label>
+                        <select id="sort" name="sort" class="sort-select" onchange="document.getElementById('filtersForm').submit()">
+                            <option value="-created_at" {% if current_filters.sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                            <option value="price" {% if current_filters.sort == 'price' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="-price" {% if current_filters.sort == '-price' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="name" {% if current_filters.sort == 'name' %}selected{% endif %}>Name: A to Z</option>
+                            <option value="-name" {% if current_filters.sort == '-name' %}selected{% endif %}>Name: Z to A</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Product Grid -->
+                {% if products %}
+                <div class="product-grid">
+                    {% for product in products %}
+                    <article class="product-card card">
+                        <div class="card-image">
+                            {% with product.images.first as primary_image %}
+                            {% if primary_image %}
+                            <img src="{{ primary_image.image.url }}" alt="{{ product.name }}" loading="lazy">
+                            {% else %}
+                            <img src="{% static 'images/placeholder-gpu.png' %}" alt="{{ product.name }}" loading="lazy">
+                            {% endif %}
+                            {% endwith %}
+
+                            <div class="product-badges">
+                                {% if product.release_year >= 2024 %}
+                                <span class="product-badge badge-new">New</span>
+                                {% endif %}
+                                {% if not product.is_in_stock %}
+                                <span class="product-badge badge-out">Out of Stock</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="product-actions">
+                                {% if product.is_in_stock %}
+                                <form action="{% url 'store:cart_add' product.id %}" method="post" class="quick-add-form">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="quantity" value="1">
+                                    <button type="submit" class="product-action-btn" title="Add to Cart">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="9" cy="21" r="1"/>
+                                            <circle cx="20" cy="21" r="1"/>
+                                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <button class="product-action-btn wishlist-btn" data-product-id="{{ product.id }}" title="Add to Wishlist">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="product-brand">{{ product.brand.name }}</div>
+                            <h3 class="product-title">
+                                <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                            </h3>
+
+                            <div class="product-specs">
+                                <span class="product-spec">{{ product.vram }}GB</span>
+                                <span class="product-spec">{{ product.memory_type }}</span>
+                            </div>
+
+                            <div class="product-footer">
+                                <div class="product-price">${{ product.price }}</div>
+                                {% if product.is_in_stock %}
+                                <a href="{{ product.get_absolute_url }}" class="btn btn-primary btn-sm">View</a>
+                                {% else %}
+                                <span class="stock-badge out">Notify Me</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if paginator.num_pages > 1 %}
+                <nav class="pagination" aria-label="Products pagination">
+                    {% if products.has_previous %}
+                    <a href="?page={{ products.previous_page_number }}" class="pagination-btn" aria-label="Previous page">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 18l-6-6 6-6"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+
+                    {% for num in paginator.page_range %}
+                        {% if num >= products.number|add:'-2' and num <= products.number|add:'2' %}
+                        <a href="?page={{ num }}" class="pagination-btn {% if num == products.number %}active{% endif %}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                    <a href="?page={{ products.next_page_number }}" class="pagination-btn" aria-label="Next page">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </nav>
+                {% endif %}
+
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="M21 21l-4.35-4.35"/>
+                        </svg>
+                    </div>
+                    <h3 class="empty-state-title">No products found</h3>
+                    <p class="empty-state-text">Try adjusting your filters or search terms.</p>
+                    <a href="{% url 'store:product_list' %}" class="btn btn-primary">Clear Filters</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .products-page {
+        padding: 2rem 0;
+    }
+
+    .products-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .products-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .products-subtitle {
+        color: #86868b;
+    }
+
+    .products-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 1024px) {
+        .products-layout {
+            grid-template-columns: 280px 1fr;
+        }
+    }
+
+    /* Filters Sidebar */
+    .filters-sidebar {
+        background: #fff;
+        border: 1px solid #e8e8ed;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        height: fit-content;
+        position: sticky;
+        top: calc(var(--header-height) + 1rem);
+    }
+
+    .filter-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #1d1d1f;
+    }
+
+    .filter-input,
+    .filter-select {
+        width: 100%;
+        padding: 0.625rem 0.875rem;
+        font-size: 0.875rem;
+        border: 1px solid #d2d2d7;
+        border-radius: 0.5rem;
+        background: #fff;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+        outline: none;
+        border-color: #1d1d1f;
+    }
+
+    .price-range {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .price-range .filter-input {
+        width: calc(50% - 0.25rem);
+    }
+
+    .price-separator {
+        color: #86868b;
+    }
+
+    .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+    }
+
+    .filter-checkbox input {
+        width: 18px;
+        height: 18px;
+    }
+
+    .filter-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e8e8ed;
+    }
+
+    /* Toolbar */
+    .products-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .results-count {
+        font-size: 0.875rem;
+        color: #86868b;
+    }
+
+    .sort-select {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border: 1px solid #d2d2d7;
+        border-radius: 0.5rem;
+        background: #fff;
+        cursor: pointer;
+    }
+
+    /* Stock badge */
+    .stock-badge.out {
+        background: #f5f5f7;
+        color: #86868b;
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+        border-radius: 2rem;
+    }
+
+    /* Quick add form */
+    .quick-add-form button {
+        width: 100%;
+    }
+
+    .product-card .product-brand {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #86868b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .product-card .product-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0.25rem 0;
+    }
+
+    .product-card .product-title a {
+        color: #1d1d1f;
+    }
+
+    .product-card .product-title a:hover {
+        color: #86868b;
+    }
+</style>
+{% endblock %}

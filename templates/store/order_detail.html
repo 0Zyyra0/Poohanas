@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_number }} - Poohanas{% endblock %}
+
+{% block content %}
+<div class="order-detail-page">
+    <div class="container">
+        <nav class="breadcrumb">
+            <a href="{% url 'store:account_dashboard' %}">My Account</a>
+            <span class="separator">›</span>
+            <a href="{% url 'store:order_list' %}">Orders</a>
+            <span class="separator">›</span>
+            <span class="current">#{{ order.order_number }}</span>
+        </nav>
+
+        <div class="order-detail-card">
+            <header class="order-header">
+                <div class="order-title">
+                    <h1>Order #{{ order.order_number }}</h1>
+                    <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+                </div>
+                <p class="order-date">Placed on {{ order.created_at|date:"F d, Y" }}</p>
+            </header>
+
+            <div class="order-sections">
+                <!-- Order Items -->
+                <section class="order-section">
+                    <h3>Items</h3>
+                    <div class="items-list">
+                        {% for item in order.items.all %}
+                        <div class="item-row">
+                            <div class="item-info">
+                                <span class="item-name">{{ item.product_name }}</span>
+                                <span class="item-price">${{ item.product_price }} × {{ item.quantity }}</span>
+                            </div>
+                            <span class="item-subtotal">${{ item.subtotal }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Shipping Address -->
+                <section class="order-section">
+                    <h3>Shipping Address</h3>
+                    <div class="address-card">
+                        <p>{{ order.shipping_address.full_name }}</p>
+                        <p>{{ order.shipping_address.address_line1 }}</p>
+                        {% if order.shipping_address.address_line2 %}<p>{{ order.shipping_address.address_line2 }}</p>{% endif %}
+                        <p>{{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.postal_code }}</p>
+                        <p>{{ order.shipping_address.country }}</p>
+                    </div>
+                </section>
+
+                <!-- Order Summary -->
+                <section class="order-section">
+                    <h3>Summary</h3>
+                    <div class="summary-totals">
+                        <div class="summary-row"><span>Subtotal</span><span>${{ order.subtotal }}</span></div>
+                        <div class="summary-row"><span>Shipping</span><span>{% if order.shipping == 0 %}FREE{% else %}${{ order.shipping }}{% endif %}</span></div>
+                        <div class="summary-row"><span>Tax</span><span>${{ order.tax }}</span></div>
+                        <div class="summary-row total"><span>Total</span><span>${{ order.total }}</span></div>
+                    </div>
+                    {% if order.is_demo %}
+                    <div class="demo-badge">Demo Order</div>
+                    {% endif %}
+                </section>
+            </div>
+
+            <div class="order-actions">
+                <a href="{% url 'store:order_list' %}" class="btn btn-outline">← Back to Orders</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .order-detail-page { padding: 2rem 0; }
+    .breadcrumb { display: flex; gap: 0.5rem; margin-bottom: 2rem; font-size: 0.875rem; }
+    .breadcrumb a { color: #86868b; }
+    .breadcrumb .current { color: #1d1d1f; font-weight: 500; }
+    .separator { color: #d2d2d7; }
+    .order-detail-card { background: #fff; border: 1px solid #e8e8ed; border-radius: 1rem; padding: 2rem; }
+    .order-header { margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e8e8ed; }
+    .order-title { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .order-title h1 { font-size: 1.5rem; }
+    .order-date { color: #86868b; font-size: 0.875rem; }
+    .order-sections { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 768px) { .order-sections { grid-template-columns: 2fr 1fr 1fr; } }
+    .order-section h3 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+    .item-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f5f5f7; }
+    .item-row:last-child { border-bottom: none; }
+    .item-name { font-weight: 500; }
+    .item-price { font-size: 0.875rem; color: #86868b; display: block; }
+    .item-subtotal { font-weight: 600; }
+    .address-card { font-size: 0.875rem; line-height: 1.6; }
+    .address-card p { margin: 0; }
+    .summary-totals { background: #f5f5f7; padding: 1rem; border-radius: 0.5rem; }
+    .summary-row { display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.875rem; }
+    .summary-row.total { font-weight: 600; font-size: 1rem; border-top: 1px solid #d2d2d7; margin-top: 0.5rem; padding-top: 0.75rem; }
+    .demo-badge { display: inline-block; margin-top: 1rem; padding: 0.25rem 0.75rem; background: #fef3c7; color: #92400e; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
+    .order-status { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-processing { background: #dbeafe; color: #1e40af; }
+    .status-shipped { background: #d1fae5; color: #065f46; }
+    .status-delivered { background: #f3f4f6; color: #374151; }
+    .order-actions { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e8e8ed; }
+</style>
+{% endblock %}

@@ -1,0 +1,658 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Poohanas - Premium Graphics Cards{% endblock %}
+
+{% block meta_description %}Shop premium NVIDIA and AMD graphics cards with exceptional performance and reliability. Experience professional-grade GPUs for gaming, content creation, and AI workloads.{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text">
+                <span class="hero-subtitle">Professional-Grade Graphics</span>
+                <h1 class="hero-title">Performance Redefined</h1>
+                <p class="hero-description">
+                    Discover premium graphics cards designed for creators, developers, and enthusiasts.
+                    Experience cutting-edge technology with uncompromising quality.
+                </p>
+                <div class="hero-actions">
+                    <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">
+                        Shop Now
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14"/>
+                            <path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </a>
+                    <a href="#featured" class="btn btn-outline btn-lg">
+                        Featured Products
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <!-- This area is for 3D visualization -->
+                <div class="hero-3d-placeholder" id="hero-3d-canvas"></div>
+                <div class="hero-brands">
+                    <span class="brand-tag">NVIDIA</span>
+                    <span class="brand-tag">AMD</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+<section id="featured" class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Featured Graphics Cards</h2>
+            <p class="section-subtitle">High-performance GPUs selected for exceptional value and performance</p>
+        </div>
+
+        <div class="product-grid">
+            {% for product in featured_products %}
+            <article class="product-card card">
+                <div class="card-image">
+                    {% with product.images.first as primary_image %}
+                    {% if primary_image %}
+                    <img src="{{ primary_image.image.url }}" alt="{{ product.name }}" loading="lazy">
+                    {% else %}
+                    <img src="{% static 'images/placeholder-gpu.png' %}" alt="{{ product.name }}" loading="lazy">
+                    {% endif %}
+                    {% endwith %}
+
+                    <div class="product-badges">
+                        {% if product.release_year >= 2024 %}
+                        <span class="product-badge badge-new">New</span>
+                        {% endif %}
+                        {% if not product.is_in_stock %}
+                        <span class="product-badge badge-out">Out of Stock</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="product-actions">
+                        {% if product.is_in_stock %}
+                        <button class="product-action-btn add-to-cart" data-product-id="{{ product.id }}">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                        </button>
+                        {% endif %}
+                        <button class="product-action-btn add-to-wishlist" data-product-id="{{ product.id }}">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <div class="product-brand">{{ product.brand.name }}</div>
+                    <h3 class="product-title">
+                        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                    </h3>
+
+                    <div class="product-specs">
+                        <span class="product-spec">{{ product.vram }}GB VRAM</span>
+                        <span class="product-spec">{{ product.gpu_series }}</span>
+                        <span class="product-spec">{{ product.memory_type }}</span>
+                    </div>
+
+                    {% if product.average_rating %}
+                    <div class="product-rating">
+                        <div class="rating-stars">
+                            {% with rating=product.average_rating %}
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= rating %}
+                                <span class="star filled">★</span>
+                                {% elif forloop.counter|add:"-0.5" <= rating %}
+                                <span class="star half">★</span>
+                                {% else %}
+                                <span class="star">★</span>
+                                {% endif %}
+                            {% endfor %}
+                            {% endwith %}
+                        </div>
+                        <span class="rating-count">{{ product.reviews.count }} reviews</span>
+                    </div>
+                    {% endif %}
+
+                    <div class="product-footer">
+                        <div class="product-price">${{ product.price }}</div>
+                        {% if product.is_in_stock %}
+                        <form action="{% url 'store:cart_add' product.id %}" method="post" class="add-to-cart-form">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary btn-sm">Add to Cart</button>
+                        </form>
+                        {% else %}
+                        <span class="stock-badge out-of-stock">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                        <rect x="2" y="7" width="20" height="14" rx="2"/>
+                        <path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/>
+                    </svg>
+                </div>
+                <h3 class="empty-state-title">No products available</h3>
+                <p class="empty-state-text">Check back soon for our premium graphics cards collection.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-8">
+            <a href="{% url 'store:product_list' %}" class="btn btn-outline">
+                View All Products
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14"/>
+                    <path d="m12 5 7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="section bg-gray">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Shop by Category</h2>
+            <p class="section-subtitle">Find the perfect graphics card for your needs</p>
+        </div>
+
+        <div class="category-grid">
+            {% for category in categories %}
+            <a href="{% url 'store:product_list' %}?category={{ category.slug }}" class="category-card">
+                <div class="category-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="7" width="20" height="14" rx="2"/>
+                        <path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/>
+                    </svg>
+                </div>
+                <h3 class="category-title">{{ category.name }}</h3>
+                <p class="category-description">{{ category.description|default:"Premium graphics cards" }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Brands -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Top Brands</h2>
+            <p class="section-subtitle">Industry-leading graphics card manufacturers</p>
+        </div>
+
+        <div class="brand-grid">
+            {% for brand in brands %}
+            <a href="{% url 'store:product_list' %}?brand={{ brand.slug }}" class="brand-card">
+                {% if brand.logo %}
+                <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" class="brand-logo">
+                {% else %}
+                <div class="brand-name">{{ brand.name }}</div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section class="section bg-gray">
+    <div class="container">
+        <div class="features-grid">
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M20 7h-9"/>
+                        <path d="M14 17H5"/>
+                        <circle cx="17" cy="17" r="3"/>
+                        <circle cx="7" cy="7" r="3"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Fast Shipping</h3>
+                <p class="feature-text">Free shipping on orders over $500. 2-3 day delivery for in-stock items.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Secure Payments</h3>
+                <p class="feature-text">All transactions are encrypted and secure. We never store payment details.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 1 0 7H6"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">30-Day Returns</h3>
+                <p class="feature-text">Not satisfied? Return within 30 days for a full refund.</p>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 8v4"/>
+                        <path d="M12 16h.01"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Expert Support</h3>
+                <p class="feature-text">Our technical team is ready to help with any questions or setup.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Three.js Script for Hero Section -->
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if Three.js is available
+        if (typeof THREE !== 'undefined') {
+            // Setup 3D scene for hero section
+            const canvas = document.getElementById('hero-3d-canvas');
+            if (canvas) {
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+                renderer.setSize(300, 300);
+                renderer.setClearColor(0x000000, 0);
+                canvas.appendChild(renderer.domElement);
+
+                // Add ambient light
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+                scene.add(ambientLight);
+
+                // Add directional light
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(5, 5, 5);
+                scene.add(directionalLight);
+
+                // Create a GPU-like box for demonstration
+                const geometry = new THREE.BoxGeometry(2, 1, 0.5);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x1d1d1f,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                camera.position.z = 5;
+
+                // Animation loop
+                function animate() {
+                    requestAnimationFrame(animate);
+                    cube.rotation.y += 0.01;
+                    cube.rotation.x += 0.005;
+                    renderer.render(scene, camera);
+                }
+
+                animate();
+            }
+        }
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const productId = this.dataset.productId;
+
+                // Show loading state
+                this.innerHTML = '<span class="spinner"></span>';
+
+                try {
+                    const form = this.closest('.add-to-cart-form');
+                    if (form) {
+                        form.submit();
+                    } else {
+                        // Fallback AJAX request
+                        const response = await fetch(`/cart/add/${productId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken'),
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Add to wishlist functionality
+        document.querySelectorAll('.add-to-wishlist').forEach(button => {
+            button.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const productId = this.dataset.productId;
+
+                // Show loading state
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<span class="spinner"></span>';
+
+                try {
+                    const response = await fetch(`/wishlist/add/${productId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        this.classList.add('active');
+                        this.innerHTML = originalHTML;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    this.innerHTML = originalHTML;
+                }
+            });
+        });
+
+        // Helper function to get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+</script>
+{% endblock %}
+
+<style>
+    /* Hero Styles */
+    .hero {
+        padding: 4rem 0;
+        background: linear-gradient(to bottom, #ffffff 0%, #f5f5f7 100%);
+    }
+
+    .hero-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        align-items: center;
+    }
+
+    @media (min-width: 1024px) {
+        .hero-content {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    .hero-subtitle {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #86868b;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        display: block;
+        margin-bottom: 0.75rem;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 1.5rem;
+        color: #1d1d1f;
+    }
+
+    .hero-description {
+        font-size: 1.125rem;
+        color: #86868b;
+        margin-bottom: 2rem;
+        max-width: 600px;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .hero-visual {
+        position: relative;
+        min-height: 300px;
+    }
+
+    .hero-3d-placeholder {
+        width: 100%;
+        height: 300px;
+        background: linear-gradient(135deg, #f5f5f7 0%, #e8e8ed 100%);
+        border-radius: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .hero-brands {
+        position: absolute;
+        bottom: 1.5rem;
+        left: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .brand-tag {
+        padding: 0.375rem 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #1d1d1f;
+    }
+
+    /* Category Grid */
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .category-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .category-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
+    }
+
+    .category-card {
+        padding: 2rem 1.5rem;
+        background: #ffffff;
+        border: 1px solid #e8e8ed;
+        border-radius: 1rem;
+        text-align: center;
+        transition: all 0.25s ease;
+    }
+
+    .category-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border-color: transparent;
+    }
+
+    .category-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 1rem;
+        color: #1d1d1f;
+    }
+
+    .category-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #1d1d1f;
+    }
+
+    .category-description {
+        font-size: 0.875rem;
+        color: #86868b;
+    }
+
+    /* Brand Grid */
+    .brand-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .brand-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .brand-grid {
+            grid-template-columns: repeat(6, 1fr);
+        }
+    }
+
+    .brand-card {
+        padding: 2rem;
+        background: #ffffff;
+        border: 1px solid #e8e8ed;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 120px;
+        transition: all 0.25s ease;
+    }
+
+    .brand-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: transparent;
+    }
+
+    .brand-logo {
+        max-width: 100%;
+        max-height: 60px;
+        object-fit: contain;
+    }
+
+    .brand-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1d1d1f;
+    }
+
+    /* Features Grid */
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(1, 1fr);
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .features-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+
+    .feature {
+        text-align: center;
+    }
+
+    .feature-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 1.5rem;
+        color: #1d1d1f;
+    }
+
+    .feature-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #1d1d1f;
+    }
+
+    .feature-text {
+        font-size: 0.875rem;
+        color: #86868b;
+    }
+
+    /* Background utilities */
+    .bg-gray {
+        background-color: #f5f5f7;
+    }
+
+    .section-header {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    /* Product card customizations for homepage */
+    .product-card .card-image {
+        aspect-ratio: 1/1;
+    }
+
+    .product-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .stock-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+        border-radius: 2rem;
+    }
+
+    .stock-badge.out-of-stock {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}

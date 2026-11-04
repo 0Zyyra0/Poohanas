@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+
+{% block title %}My Account - Poohanas{% endblock %}
+
+{% block content %}
+<div class="account-page">
+    <div class="container">
+        <h1 class="page-title">My Account</h1>
+
+        <div class="account-layout">
+            <!-- Sidebar -->
+            <aside class="account-sidebar">
+                <nav class="account-nav">
+                    <a href="{% url 'store:account_dashboard' %}" class="account-nav-item active">Dashboard</a>
+                    <a href="{% url 'store:order_list' %}" class="account-nav-item">Orders</a>
+                    <a href="{% url 'store:wishlist_detail' %}" class="account-nav-item">Wishlist</a>
+                    <a href="#" class="account-nav-item">Addresses</a>
+                    <a href="#" class="account-nav-item">Settings</a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="account-main">
+                <div class="welcome-section">
+                    <h2>Welcome back, {{ user.username }}!</h2>
+                    <p>Manage your orders, wishlist, and account settings.</p>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="dashboard-grid">
+                    <div class="stats-card">
+                        <h4>Total Orders</h4>
+                        <div class="value">{{ orders.count }}</div>
+                    </div>
+                    <div class="stats-card">
+                        <h4>Wishlist Items</h4>
+                        <div class="value">{{ wishlist_count }}</div>
+                    </div>
+                </div>
+
+                <!-- Recent Orders -->
+                <div class="recent-section">
+                    <div class="section-header">
+                        <h3>Recent Orders</h3>
+                        <a href="{% url 'store:order_list' %}" class="view-all">View All</a>
+                    </div>
+
+                    {% if orders %}
+                    <div class="orders-list">
+                        {% for order in orders %}
+                        <div class="order-item-mini">
+                            <div class="order-info">
+                                <span class="order-id">#{{ order.order_number }}</span>
+                                <span class="order-date">{{ order.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="order-status-mini status-{{ order.status }}">{{ order.get_status_display }}</div>
+                            <div class="order-total-mini">${{ order.total }}</div>
+                            <a href="{% url 'store:order_detail' order.order_number %}" class="btn btn-sm btn-outline">View</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="empty-message">No orders yet. <a href="{% url 'store:product_list' %}">Start shopping</a></p>
+                    {% endif %}
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<style>
+    .account-page {
+        padding: 2rem 0;
+    }
+
+    .page-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .account-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .account-layout {
+            grid-template-columns: 240px 1fr;
+        }
+    }
+
+    .account-sidebar {
+        background: #fff;
+        border: 1px solid #e8e8ed;
+        border-radius: 1rem;
+        padding: 1rem;
+        height: fit-content;
+        position: sticky;
+        top: calc(var(--header-height) + 1rem);
+    }
+
+    .account-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .account-nav-item {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        transition: all 0.2s;
+    }
+
+    .account-nav-item:hover {
+        background: #f5f5f7;
+    }
+
+    .account-nav-item.active {
+        background: #1d1d1f;
+        color: #fff;
+    }
+
+    .account-main {
+        background: #fff;
+        border: 1px solid #e8e8ed;
+        border-radius: 1rem;
+        padding: 2rem;
+    }
+
+    .welcome-section {
+        margin-bottom: 2rem;
+    }
+
+    .welcome-section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-section p {
+        color: #86868b;
+    }
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stats-card {
+        padding: 1.5rem;
+        background: #f5f5f7;
+        border-radius: 0.75rem;
+    }
+
+    .stats-card h4 {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #86868b;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card .value {
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: #1d1d1f;
+    }
+
+    .recent-section {
+        margin-top: 2rem;
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .view-all {
+        font-size: 0.875rem;
+        color: #1d1d1f;
+        font-weight: 500;
+    }
+
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .order-item-mini {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f5f5f7;
+        border-radius: 0.5rem;
+    }
+
+    .order-info {
+        flex: 1;
+    }
+
+    .order-id {
+        font-weight: 600;
+        display: block;
+    }
+
+    .order-date {
+        font-size: 0.75rem;
+        color: #86868b;
+    }
+
+    .order-status-mini {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-weight: 500;
+    }
+
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-processing { background: #dbeafe; color: #1e40af; }
+    .status-shipped { background: #d1fae5; color: #065f46; }
+    .status-delivered { background: #f3f4f6; color: #374151; }
+
+    .order-total-mini {
+        font-weight: 600;
+    }
+
+    .empty-message {
+        text-align: center;
+        padding: 2rem;
+        color: #86868b;
+    }
+
+    .empty-message a {
+        color: #1d1d1f;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}

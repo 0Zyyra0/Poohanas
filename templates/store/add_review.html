@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Review - {{ product.name }} - Poohanas{% endblock %}
+
+{% block content %}
+<div class="add-review-page">
+    <div class="container">
+        <div class="review-form-card">
+            <h1>Review {{ product.name }}</h1>
+
+            <form method="post" class="review-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label">Rating</label>
+                    <div class="star-rating-input">
+                        {% for i in "54321"|make_list %}
+                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" required>
+                        <label for="star{{ i }}" class="star-label">★</label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="title" class="form-label">Review Title</label>
+                    <input type="text" id="title" name="title" class="form-input" placeholder="Summarize your review" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="comment" class="form-label">Your Review</label>
+                    <textarea id="comment" name="comment" class="form-textarea" rows="6" placeholder="Share your experience with this product..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                    <a href="{{ product.get_absolute_url }}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .add-review-page { padding: 3rem 0; }
+    .review-form-card { max-width: 600px; margin: 0 auto; background: #fff; border: 1px solid #e8e8ed; border-radius: 1rem; padding: 2.5rem; }
+    .review-form-card h1 { font-size: 1.75rem; margin-bottom: 2rem; }
+    .review-form { display: flex; flex-direction: column; gap: 1.5rem; }
+    .star-rating-input { display: flex; flex-direction: row-reverse; gap: 0.25rem; }
+    .star-rating-input input { display: none; }
+    .star-rating-input .star-label { font-size: 2rem; color: #d2d2d7; cursor: pointer; }
+    .star-rating-input input:checked ~ .star-label,
+    .star-rating-input .star-label:hover,
+    .star-rating-input .star-label:hover ~ .star-label { color: #fbbf24; }
+    .form-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+</style>
+
+<script>
+    document.querySelectorAll('.star-label').forEach(label => {
+        label.addEventListener('click', function() {
+            const forAttr = this.getAttribute('for');
+            document.querySelectorAll('.star-label').forEach(l => {
+                if (l.getAttribute('for') <= forAttr.replace('star', '')) {
+                    l.style.color = '#fbbf24';
+                } else {
+                    l.style.color = '#d2d2d7';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

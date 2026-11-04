@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Order History - Poohanas{% endblock %}
+
+{% block content %}
+<div class="order-list-page">
+    <div class="container">
+        <h1 class="page-title">Order History</h1>
+
+        {% if orders %}
+        <div class="orders-container">
+            {% for order in orders %}
+            <article class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <span class="order-id">Order #{{ order.order_number }}</span>
+                        <span class="order-date">{{ order.created_at|date:"F d, Y" }}</span>
+                    </div>
+                    <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+                </div>
+
+                <div class="order-items">
+                    {% for item in order.items.all|slice:":3" %}
+                    <div class="order-item">
+                        <span class="item-name">{{ item.product_name }}</span>
+                        <span class="item-qty">x{{ item.quantity }}</span>
+                        <span class="item-price">${{ item.subtotal }}</span>
+                    </div>
+                    {% endfor %}
+                    {% if order.items.count > 3 %}
+                    <div class="more-items">+{{ order.items.count|add:"-3" }} more items</div>
+                    {% endif %}
+                </div>
+
+                <div class="order-footer">
+                    <div class="order-total">
+                        <span>Total:</span>
+                        <span class="total-amount">${{ order.total }}</span>
+                    </div>
+                    <a href="{% url 'store:order_detail' order.order_number %}" class="btn btn-sm btn-outline">View Details</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <path d="M16 10a4 4 0 0 1-8 0"/>
+                </svg>
+            </div>
+            <h3 class="empty-state-title">No orders yet</h3>
+            <p class="empty-state-text">When you place orders, they will appear here.</p>
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary">Start Shopping</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .order-list-page { padding: 2rem 0; }
+    .page-title { font-size: 2rem; font-weight: 600; margin-bottom: 2rem; }
+    .order-card { background: #fff; border: 1px solid #e8e8ed; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .order-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #e8e8ed; }
+    .order-id { font-size: 1.125rem; font-weight: 600; display: block; }
+    .order-date { font-size: 0.875rem; color: #86868b; }
+    .order-status { padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+    .status-pending { background: #fef3c7; color: #92400e; }
+    .status-processing { background: #dbeafe; color: #1e40af; }
+    .status-shipped { background: #d1fae5; color: #065f46; }
+    .status-delivered { background: #f3f4f6; color: #374151; }
+    .status-cancelled { background: #fee2e2; color: #991b1b; }
+    .order-item { display: flex; justify-content: space-between; padding: 0.5rem 0; font-size: 0.875rem; }
+    .more-items { font-size: 0.75rem; color: #86868b; padding: 0.5rem 0; }
+    .order-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e8e8ed; }
+    .total-amount { font-size: 1.25rem; font-weight: 600; }
+</style>
+{% endblock %}

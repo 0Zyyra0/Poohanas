@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Wishlist - Poohanas{% endblock %}
+
+{% block content %}
+<div class="wishlist-page">
+    <div class="container">
+        <h1 class="page-title">Your Wishlist</h1>
+
+        {% if wishlist.products.all %}
+        <div class="wishlist-grid">
+            {% for product in wishlist.products.all %}
+            <article class="product-card card">
+                <div class="card-image">
+                    {% with product.images.first as image %}
+                    {% if image %}
+                    <img src="{{ image.image.url }}" alt="{{ product.name }}">
+                    {% else %}
+                    <img src="{% static 'images/placeholder-gpu.png' %}" alt="{{ product.name }}">
+                    {% endif %}
+                    {% endwith %}
+                    <form action="{% url 'store:wishlist_remove' product.id %}" method="post" class="remove-wishlist-form">
+                        {% csrf_token %}
+                        <button type="submit" class="remove-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+                <div class="card-body">
+                    <div class="product-brand">{{ product.brand.name }}</div>
+                    <h3 class="product-title">
+                        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                    </h3>
+                    <div class="product-specs">
+                        <span class="product-spec">{{ product.vram }}GB VRAM</span>
+                        <span class="product-spec">{{ product.memory_type }}</span>
+                    </div>
+                    <div class="product-footer">
+                        <div class="product-price">${{ product.price }}</div>
+                        <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-primary btn-sm">View Details</a>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </div>
+            <h3 class="empty-state-title">Your wishlist is empty</h3>
+            <p class="empty-state-text">Save products you're interested in for later.</p>
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse Products</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .wishlist-page { padding: 2rem 0; }
+    .page-title { font-size: 2rem; font-weight: 600; margin-bottom: 2rem; }
+    .product-card { position: relative; }
+    .remove-btn { position: absolute; top: 0.5rem; right: 0.5rem; width: 36px; height: 36px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); color: #ff3b30; transition: all 0.2s; }
+    .remove-btn:hover { transform: scale(1.1); background: #fee2e2; }
+</style>
+{% endblock %}

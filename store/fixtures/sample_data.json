@@ -1,0 +1,282 @@
+[
+  {
+    "model": "store.brand",
+    "pk": 1,
+    "fields": {
+      "name": "NVIDIA",
+      "slug": "nvidia",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.brand",
+    "pk": 2,
+    "fields": {
+      "name": "AMD",
+      "slug": "amd",
+      "created_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.category",
+    "pk": 1,
+    "fields": {
+      "name": "Gaming",
+      "slug": "gaming",
+      "description": "High-performance GPUs for gaming",
+      "parent": null,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.category",
+    "pk": 2,
+    "fields": {
+      "name": "Professional",
+      "slug": "professional",
+      "description": "Workstation-grade graphics cards",
+      "parent": null,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 1,
+    "fields": {
+      "brand": 1,
+      "name": "GeForce RTX 4090",
+      "slug": "geforce-rtx-4090",
+      "category": 1,
+      "description": "The ultimate GPU for gamers and creators. Powered by the new Ada Lovelace architecture, the RTX 4090 delivers unprecedented performance and AI-powered graphics.",
+      "price": "1599.00",
+      "stock": 15,
+      "vram": 24,
+      "gpu_series": "RTX 40 Series",
+      "memory_type": "GDDR6X",
+      "interfaces": "HDMI 2.1, DisplayPort 1.4a",
+      "power_requirements": "450W",
+      "length": 336,
+      "release_year": 2024,
+      "is_available": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 2,
+    "fields": {
+      "brand": 1,
+      "name": "GeForce RTX 4080 Super",
+      "slug": "geforce-rtx-4080-super",
+      "category": 1,
+      "description": "Supercharged performance for 4K gaming. The RTX 4080 Super features enhanced cores and higher clock speeds for elite gaming.",
+      "price": "999.00",
+      "stock": 25,
+      "vram": 16,
+      "gpu_series": "RTX 40 Series",
+      "memory_type": "GDDR6X",
+      "interfaces": "HDMI 2.1, DisplayPort 1.4a",
+      "power_requirements": "320W",
+      "length": 304,
+      "release_year": 2024,
+      "is_available": true,
+      "created_at": "2024-01-15T00:00:00Z",
+      "updated_at": "2024-01-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 3,
+    "fields": {
+      "brand": 1,
+      "name": "GeForce RTX 4070 Ti Super",
+      "slug": "geforce-rtx-4070-ti-super",
+      "category": 1,
+      "description": "Exceptional 1440p gaming with ray tracing. The RTX 4070 Ti Super delivers stunning visuals at competitive prices.",
+      "price": "799.00",
+      "stock": 30,
+      "vram": 16,
+      "gpu_series": "RTX 40 Series",
+      "memory_type": "GDDR6X",
+      "interfaces": "HDMI 2.1, DisplayPort 1.4a",
+      "power_requirements": "285W",
+      "length": 285,
+      "release_year": 2024,
+      "is_available": true,
+      "created_at": "2024-02-01T00:00:00Z",
+      "updated_at": "2024-02-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 4,
+    "fields": {
+      "brand": 1,
+      "name": "GeForce RTX 4060 Ti",
+      "slug": "geforce-rtx-4060-ti",
+      "category": 1,
+      "description": "Great value for 1080p and 1440p gaming. Features DLSS 3 and efficient power consumption.",
+      "price": "399.00",
+      "stock": 50,
+      "vram": 8,
+      "gpu_series": "RTX 40 Series",
+      "memory_type": "GDDR6",
+      "interfaces": "HDMI 2.1, DisplayPort 1.4a",
+      "power_requirements": "160W",
+      "length": 240,
+      "release_year": 2023,
+      "is_available": true,
+      "created_at": "2024-03-01T00:00:00Z",
+      "updated_at": "2024-03-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 5,
+    "fields": {
+      "brand": 2,
+      "name": "Radeon RX 7900 XTX",
+      "slug": "radeon-rx-7900-xtx",
+      "category": 1,
+      "description": "AMD's flagship gaming GPU with 24GB GDDR6. Exceptional 4K performance with ray tracing support.",
+      "price": "949.00",
+      "stock": 20,
+      "vram": 24,
+      "gpu_series": "Radeon RX 7000",
+      "memory_type": "GDDR6",
+      "interfaces": "HDMI 2.1, DisplayPort 2.1",
+      "power_requirements": "355W",
+      "length": 287,
+      "release_year": 2023,
+      "is_available": true,
+      "created_at": "2024-01-10T00:00:00Z",
+      "updated_at": "2024-01-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 6,
+    "fields": {
+      "brand": 2,
+      "name": "Radeon RX 7900 XT",
+      "slug": "radeon-rx-7900-xt",
+      "category": 1,
+      "description": "Powerful 4K gaming at a competitive price. 20GB GDDR6 memory with advanced RDNA 3 architecture.",
+      "price": "699.00",
+      "stock": 25,
+      "vram": 20,
+      "gpu_series": "Radeon RX 7000",
+      "memory_type": "GDDR6",
+      "interfaces": "HDMI 2.1, DisplayPort 2.1",
+      "power_requirements": "300W",
+      "length": 276,
+      "release_year": 2023,
+      "is_available": true,
+      "created_at": "2024-01-20T00:00:00Z",
+      "updated_at": "2024-01-20T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 7,
+    "fields": {
+      "brand": 2,
+      "name": "Radeon RX 7800 XT",
+      "slug": "radeon-rx-7800-xt",
+      "category": 1,
+      "description": "Excellent 1440p gaming performance. 16GB GDDR6 with FSR 3 support for enhanced visuals.",
+      "price": "499.00",
+      "stock": 35,
+      "vram": 16,
+      "gpu_series": "Radeon RX 7000",
+      "memory_type": "GDDR6",
+      "interfaces": "HDMI 2.1, DisplayPort 2.1",
+      "power_requirements": "263W",
+      "length": 267,
+      "release_year": 2023,
+      "is_available": true,
+      "created_at": "2024-02-15T00:00:00Z",
+      "updated_at": "2024-02-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.product",
+    "pk": 8,
+    "fields": {
+      "brand": 2,
+      "name": "Radeon RX 7700 XT",
+      "slug": "radeon-rx-7700-xt",
+      "category": 1,
+      "description": "Great value for 1440p gaming. Features 12GB GDDR6 and advanced cooling.",
+      "price": "449.00",
+      "stock": 40,
+      "vram": 12,
+      "gpu_series": "Radeon RX 7000",
+      "memory_type": "GDDR6",
+      "interfaces": "HDMI 2.1, DisplayPort 2.1",
+      "power_requirements": "245W",
+      "length": 267,
+      "release_year": 2023,
+      "is_available": true,
+      "created_at": "2024-03-01T00:00:00Z",
+      "updated_at": "2024-03-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "store.productspecification",
+    "pk": 1,
+    "fields": {
+      "product": 1,
+      "key": "Architecture",
+      "value": "Ada Lovelace"
+    }
+  },
+  {
+    "model": "store.productspecification",
+    "pk": 2,
+    "fields": {
+      "product": 1,
+      "key": "CUDA Cores",
+      "value": "16384"
+    }
+  },
+  {
+    "model": "store.productspecification",
+    "pk": 3,
+    "fields": {
+      "product": 1,
+      "key": "Boost Clock",
+      "value": "2.52 GHz"
+    }
+  },
+  {
+    "model": "store.productspecification",
+    "pk": 4,
+    "fields": {
+      "product": 5,
+      "key": "Architecture",
+      "value": "RDNA 3"
+    }
+  },
+  {
+    "model": "store.productspecification",
+    "pk": 5,
+    "fields": {
+      "product": 5,
+      "key": "Compute Units",
+      "value": "96"
+    }
+  },
+  {
+    "model": "store.productspecification",
+    "pk": 6,
+    "fields": {
+      "product": 5,
+      "key": "Game Clock",
+      "value": "2.3 GHz"
+    }
+  }
+]
